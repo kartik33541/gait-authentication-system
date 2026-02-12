@@ -121,6 +121,8 @@ Decisions are returned based on sliding window predictions and majority voting l
 * **Research vs. Production:** See the comparison table in the sections above for phase differences.
 * **Research Documentation:** [research/README.md](research/README.md)
 * **Deployment Details:** [production/README.md](production/README.md)
-* **AI Transparency:** [llm_usage.md](llm_usage.md)
+* **LLM Usage:** [llm_usage.md](llm_usage.md)
+* **Documentation:** [Documentation.md](Documentation.md)
 
 **Final Note:** This system demonstrates that subtle human gait patterns captured through smartphone sensors can be engineered into a functional biometric system, validated through the research phase and proven in real-world deployment.
+>>>>>>> 941886a (Updated documentation, reconstructed results folder, refined methodology and requirements)
