@@ -200,8 +200,9 @@ Static detection correctly rejects non-walking sessions.
 
 ---
 
-## 🏗 8️⃣ Production Folder Structure
+# 🏗 8️⃣ Production Folder Structure
 
+```
 production/
 │
 ├── app/
@@ -209,12 +210,12 @@ production/
 │ ├── infer_identity.py       # Prediction logic
 │
 ├── data/
-│ └── RealWorldLive/       # Training dataset (Person folders) this data i have collected using my own app with 20hz frequency which can be modified to 50hz as per need
+│ └── RealWorldLive/       # Training dataset (Person folders) this data I have collected using my own app with 20Hz frequency which can be modified to 50Hz as per need
 │
 ├── mobile_app/
 │ ├── gait_app.aia # MIT App Inventor project
 │ ├── gait_app.apk # Installable Android app
-| ├── img          # images of app 
+│ └── img          # images of app 
 │
 ├── model/
 │ ├── rf_model.pkl # Trained Random Forest Model
@@ -223,7 +224,7 @@ production/
 ├── train_and_save_model.py # Model training script
 ├── received_gait.csv # Runtime session file
 └── README.md # This file
-
+```
 
 ---
 
