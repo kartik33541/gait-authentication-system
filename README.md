@@ -28,10 +28,11 @@ Virtual environment is optional but strongly recommended.
 ```bash
 cd gait_authentication
 ```
-## Step 2 – Create Virtual Environment (Recommended)
-```bash
-yaml -m venv venv
-yaml\Scripts\activate   Windows   results and model was trained on conda  environment
+## Step 2 - Create Virtual Environment (Recommended)
+python -m venv venv
+# For Windows:
+venv\Scripts\activate  
+# Note: Results and experiments were originally trained on a Conda environment (Recommended)
 ```
 ## Step 3 – Install Dependencies
 ```bash
@@ -60,33 +61,66 @@ These notebooks include:
 - Real-world dataset experiments (Physics Toolbox)
 For full research explanation, methodology, and analysis:
 documentation/research/README.md`
-### OPTION B — Run Real-Time Authentication System (Production Mode)
-If you want to experience live gait authentication, this section allows you to:
-- Collect your own walking data (`production/mobile_app/gait_app.apk`) which will automatically send data via HTTP POST after starting `server.py`.
-e.g., start server.py first.
-'the app made from MIT App Inventor'
-to collect data.
-to train your model,
-to perform real-time authentication via mobile app.
-definition of the production system overview:
-mobile app → CSV Data → HTTP POST → Server → Model → Access Decision.
-default configuration for the model includes:
-rForest with 800 trees,
-total features per window =56,
-wsize=128 samples,
-sampling rate ≈20Hz,
-duration≈6.4s,
-overlap=75%,
-voting threshold=0.45,
-st static motion detection enabled.
-detailed setup steps are as follows:
-activate virtual environment (`venv\Scripts\activate`),
-navigate to production folder (`cd production`),
-pick or prepare training data following structure in `production/data/RealWorldLive/`,
-generate model files by running `python train_and_save_model.py`, start server with `python app/server.py`, install mobile app APK (`gait_app.apk`) on Android device, ensure laptop and mobile are connected to same WiFi network or hotspot, open the app, enter IP address, start walking; sensor data is sent automatically for inference; access decision returned based on majority voting with threshold of 0.45.
-defining possible access responses such as `ACCESS_GRANTED`, `ACCESS_DENIED`, etc., based on sliding window predictions and majority voting logic.
-detailed project structure provided in the directory tree layout above.
-differences between research phases vs production deployment summarized in tabular form above.
-further documentation links provided for detailed research experiments (`research/README.md`) and deployment details (`production/README.md`).
-further information about AI assistance transparency available in `llm_usage.md`. 
-the final note emphasizes that subtle human gait patterns captured through sensors can be engineered into a functional biometric system validated through research phase and demonstrated in real-world deployment.
+
+## OPTION B — Run Real-Time Authentication System (Production Mode)
+
+If you want to experience live gait authentication, this section allows you to collect your own walking data, train a custom model, and perform real-time authentication via the mobile app.
+
+### 🚀 Production System Overview
+The data flow for the real-time system is defined as:
+**Mobile App** → **CSV Data** → **HTTP POST** → **Server** → **Model** → **Access Decision**
+
+
+### 🛠️ Model Configuration
+The production system uses the following default parameters:
+* **Algorithm:** Random Forest (800 trees)
+* **Feature Engineering:** 56 total features per window
+* **Window Size:** 128 samples (approx. 6.4s duration)
+* **Sampling Rate:** ≈20Hz
+* **Overlap:** 75% (32-sample step size)
+* **Decision Logic:** Majority voting (Threshold = 0.45)
+* **Preprocessing:** Static motion detection enabled
+
+---
+
+### 📝 Detailed Setup Steps
+
+1.  **Environment Setup:** Activate your virtual environment:
+    ```bash
+    venv\Scripts\activate
+    ```
+2.  **Navigation:** Move to the production directory:
+    ```bash
+    cd production
+    ```
+3.  **Data Preparation:** Prepare training data following the directory structure in: 
+    `production/data/RealWorldLive/`
+4.  **Model Training:** Generate your model and scaler files:
+    ```bash
+    python train_and_save_model.py
+    ```
+5.  **Start Server:** Launch the inference server:
+    ```bash
+    python app/server.py
+    ```
+6.  **Mobile App Installation:** Install `gait_app.apk` (built with MIT App Inventor) on your Android device.
+7.  **Connectivity:** Ensure both your laptop and mobile device are on the **same WiFi network or hotspot**.
+8.  **Authentication:** Open the app, enter your laptop's IP address, and start walking. Sensor data is sent automatically for real-time inference.
+
+---
+
+### 🔑 Authentication Logic & Responses
+Decisions are returned based on sliding window predictions and majority voting logic. Possible responses include:
+* `ACCESS_GRANTED`
+* `ACCESS_DENIED` (due to unauthorized gait, static motion, or insufficient data)
+
+---
+
+### 📂 Further Information
+* **Project Structure:** Refer to the directory tree layout provided in the main README.
+* **Research vs. Production:** See the comparison table in the sections above for phase differences.
+* **Research Documentation:** [research/README.md](research/README.md)
+* **Deployment Details:** [production/README.md](production/README.md)
+* **AI Transparency:** [llm_usage.md](llm_usage.md)
+
+**Final Note:** This system demonstrates that subtle human gait patterns captured through smartphone sensors can be engineered into a functional biometric system, validated through the research phase and proven in real-world deployment.
