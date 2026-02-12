@@ -103,7 +103,7 @@ The production system uses the following default parameters:
     ```bash
     python app/server.py
     ```
-6.  **Mobile App Installation:** Install `gait_app.apk` (built with MIT App Inventor) on your Android device.
+6.  **Mobile App Installation:** Install `gait_app.apk` (built with MIT App Inventor) on your Android device.First open your Laptop connect it with phone hotspot (Campus wifi may    block http post) type "ipconfig" on terminal type your ip on app , now start the server.py first then read steps below.
 7.  **Connectivity:** Ensure both your laptop and mobile device are on the **same WiFi network or hotspot**.
 8.  **Authentication:** Open the app, enter your laptop's IP address, and start walking. Sensor data is sent automatically for real-time inference.
 
