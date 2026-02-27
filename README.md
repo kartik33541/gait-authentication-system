@@ -131,6 +131,41 @@ The server includes an AI Warm-up Routine to eliminate the first-request lag and
 
 ---
 
+# 📲 6. Mobile App Connectivity & Access Methods
+
+The system supports two primary ways to connect the Android application to the inference server. Depending on your setup, ensure you install the correct `.apk` from the `production/mobile_app/` directory.
+
+## 🏠 Method A: Local IP Address (Development)
+**Use Case:** Testing the system on your local WiFi or Mobile Hotspot without deploying to the cloud.
+
+**App to Use:** `GaitAuth_Flask2.apk`
+
+### Setup Steps:
+1. Connect both your laptop and phone to the same Mobile Hotspot (recommended to bypass firewall restrictions).
+2. Find your laptop's Local IP by typing `ipconfig` in the terminal (e.g., `192.168.1.5`).
+3. Open the app and enter the URL: `http://YOUR_IP:8000/predict` (or port 7860 if running the production script).
+
+**Advantage:** Minimal latency and works without an active internet connection.
+
+## 🌐 Method B: Live Link (Cloud Verification)
+**Use Case:** Accessing the server via the public internet once deployed on Render or Hugging Face.
+
+**App to Use:** `GaitAuth_Live.apk`
+
+### Setup Steps:
+1. Ensure your server is deployed and the status is **Live/Running**.
+2. Copy your public URL from the Render/Hugging Face dashboard (e.g., `https://gait-secure-api.onrender.com`).
+3. Open the app and enter the URL: `https://your-app-name.onrender.com/predict`.
+
+**Advantage:** Allows for remote authentication from any location with internet access.
+
+## ⚠️ Connectivity Troubleshooting
+- **API Key:** Both methods require the header `X-API-KEY: GAIT_SECURE_2026` to be configured within the app logic.
+- **Cold Start:** If using Method B on Render's free tier, the first request may take ~50 seconds to "wake up" the server.
+- **Endpoint:** Always ensure the URL ends with the `/predict` route.
+
+---
+
 ### 📂 Further Information
 * **Project Structure:** Refer to the directory tree layout provided in the main README.
 * **Research vs. Production:** See the comparison table in the sections above for phase differences.
