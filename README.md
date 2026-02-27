@@ -1,118 +1,133 @@
 # AI-Powered Contactless Gait Authentication System
 
-This project implements a **Gait-based Biometric Authentication System** using smartphone accelerometer and gyroscope data.
+This project implements a **Gait-based Biometric Authentication System** using smartphone accelerometer and gyroscope data. It demonstrates that human gait patterns are unique behavioral signatures that can be used for contactless security.
 
-It consists of two major parts:
+## Repository Structure
+The repository is structured into two distinct environments:
 
-1. **Research Phase** – Model development, validation, and experimentation.
-2. **Production Phase** – Real-time authentication system using a mobile app and HTTP server.
+### Research Phase
+- Benchmarking and feature engineering using traditional Machine Learning (Random Forest) on the UCI HAR and Physics Toolbox datasets.
 
-The system demonstrates that human gait patterns can be used as a biometric identifier.
-
----
-
-# Python Version
-
-All experiments and production code were tested on:
-
-**Python 3.12.0 (Recommended)**
-
-Virtual environment is optional but strongly recommended.
+### Production Phase
+- A high-precision, real-time authentication pipeline using:
+  - Siamese 1D-CNN Encoder
+  - Triplet Loss embeddings
+  - AI-driven synthetic data scaling.
 
 ---
 
-# Quick Setup
+# 🛠️ General Environment Setup
 
-## Step 1 – Clone Repository
+## Python Version
+All experiments and production code were tested on: **Python 3.12.0**
 
+## Step 1 – Clone and Navigate
 ```bash
+git clone https://github.com/kartik33541/gait-auth-api.git
 cd gait_authentication
 ```
-## Step 2 - Create Virtual Environment (Recommended)
+
+## Step 2 - Virtual Environment (Highly Recommended)
+```bash
 python -m venv venv
-# For Windows:
-venv\Scripts\activate  
-# Note: Results and experiments were originally trained on a Conda environment (Recommended)
 ```
+- *For Windows:* 
+  ```bash
+  venv\Scripts\activate
+  ```
+- *For Mac/Linux:* 
+  ```bash
+  source venv/bin/activate
+  ```
+
 ## Step 3 – Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
-## Choose What You Want to Run
-You have two main options:
+---
 
-### OPTION A — Validate Research Results (Pre-Collected Data)
-If you want to:
+# Research and Production System Overview
+
+## 🔬 OPTION A — Validate Research Results
+This section is for evaluating the initial feasibility of the project using handcrafted features and traditional classifiers.
+
+### Research Goals:
 - Validate UCI HAR results (>80% accuracy)
 - Evaluate real-world Physics Toolbox dataset (8 users)
-- See experimental analysis and comparisons
-- Inspect window-level and file-level accuracy
-Navigate to:
-- `research/notebooks/`
-Run notebooks in this order:
-- `01_uci_har_person_identification.ipynb` — To validate UCI HAR dataset 
-- `02_real_world_baseline.ipynb` — Notebook 2,3,4 tested on real-world dataset inside `Research/RealWorld1` (dataset of 8 users collected from Physics Toolbox Sensor suite)
-- `03_real_world_improvements.ipynb`
-- `04_authentication_simulation.ipynb`
-These notebooks include:
-- 80:20, 70:30, 60:40 validation splits (UCI HAR)
-- Window-level & file-level metrics
-- Majority voting analysis
-- Real-world dataset experiments (Physics Toolbox)
-For full research explanation, methodology, and analysis:
-documentation/research/README.md`
+- Analyze window-level vs. file-level majority voting
 
-## OPTION B — Run Real-Time Authentication System (Production Mode)
-
-If you want to experience live gait authentication, this section allows you to collect your own walking data, train a custom model, and perform real-time authentication via the mobile app.
-
-### 🚀 Production System Overview
-The data flow for the real-time system is defined as:
-**Mobile App** → **CSV Data** → **HTTP POST** → **Server** → **Model** → **Access Decision**
-
-
-### 🛠️ Model Configuration
-The production system uses the following default parameters:
-* **Algorithm:** Random Forest (800 trees)
-* **Feature Engineering:** 56 total features per window
-* **Window Size:** 128 samples (approx. 6.4s duration)
-* **Sampling Rate:** ≈20Hz
-* **Overlap:** 75% (32-sample step size)
-* **Decision Logic:** Majority voting (Threshold = 0.45)
-* **Preprocessing:** Static motion detection enabled
+### Execution Order:
+1. Navigate to `research/notebooks/` and run:
+   - `01_uci_har_person_identification.ipynb`: Validates the UCI HAR dataset with 80:20, 70:30, and 60:40 splits.
+   - `02_real_world_baseline.ipynb`: Benchmarks the 8-person RealWorld1 dataset.
+   - `03_real_world_improvements.ipynb`: Explores window overlap and feature scaling.
+   - `04_authentication_simulation.ipynb`: Simulates real-world "Access Granted/Denied" scenarios.
 
 ---
 
-### 📝 Detailed Setup Steps
+## 🚀 OPTION B — Real-Time Production System (Siamese 1D-CNN)
+The production system is a hardened, scalable API designed for real-world deployment.
 
-1.  **Environment Setup:** Activate your virtual environment:
-    ```bash
-    venv\Scripts\activate
-    ```
-2.  **Navigation:** Move to the production directory:
-    ```bash
-    cd production
-    ```
-3.  **Data Preparation:** Prepare training data following the directory structure in: 
-    `production/data/RealWorldLive/`
-4.  **Model Training:** Generate your model and scaler files:
-    ```bash
-    python train_and_save_model.py
-    ```
-5.  **Start Server:** Launch the inference server:
-    ```bash
-    python app/server.py
-    ```
-6.  **Mobile App Installation:** Install `gait_app.apk` (built with MIT App Inventor) on your Android device.First open your Laptop connect it with phone hotspot (Campus wifi may    block http post) type "ipconfig" on terminal type your ip on app , now start the server.py first then read steps below.
-7.  **Connectivity:** Ensure both your laptop and mobile device are on the **same WiFi network or hotspot**.
-8.  **Authentication:** Open the app, enter your laptop's IP address, and start walking. Sensor data is sent automatically for real-time inference.
+### 🧬 Model Architecture & Logic
+- **Architecture:** Siamese 1D-Convolutional Neural Network (1D-CNN)
+- **Core Engine:** Deep Metric Learning using Triplet Loss to map gait cycles into a 128-D embedding space.
+- **Preprocessing:** Butterworth Bandpass Filter (0.5Hz – 3Hz) removes gravity bias and sensor jitter.
+- **Security Guard:** Physics-based Walk Energy Score (`std(√(a_x^2 + a_y^2 + a_z^2)) ≥ 1.0`) to defeat "lift-and-drop" spoofing attacks.
+- **Authentication:** Cosine Similarity threshold of 0.70 for biometric matching.
+
+# 📝 Step-by-Step Production Setup
+
+## 1. Navigate to Production
+```bash
+cd production
+```
+
+## 2. Scaling the Dataset (AI Generator)
+To prevent overfitting, the system expands the 10 real users to 110 unique identities using biological variance injection.
+
+### Bash:
+```bash
+python generate_synthetic_gait.py
+```
+Navigate back:
+```bash
+cd ..
+```
+
+### How it works:
+This script reads the real-world "seed" data and applies Time Warping, Jittering, and Phase Shifting to create 100 new synthetic walkers. This ensures the model learns gait mechanics rather than memorizing 10 specific people.
+
+## 3. Train the Siamese Brain
+```bash
+python cnn_engine/train_siamese.py
+```
+This script trains the 1D-CNN encoder to recognize unique gait signatures across all 110 identities.
+
+## 4. Enroll Authorized Users
+```bash
+python cnn_engine/enroll_templates.py
+```
+This generates the mathematical `.pkl` templates for Person 1-10. These templates are what the live walk is compared against.
+
+## 5. Launch the Robust Flask Server
+```bash
+python app/flask_server.py
+```
+The server includes an AI Warm-up Routine to eliminate the first-request lag and an API Key security layer.
+
+## 6. Mobile App Integration 
+- Install `GaitAuth_Live.apk` on your Android device.
+- **Network Setup:** Connect your phone and laptop to the same Mobile Hotspot (to bypass campus firewalls).
+- Find your laptop IP using `ipconfig` and enter it into the app (e.g., `http://192.168.1.5:8000`).
+- **Test:** Walk naturally for 15 seconds. The app sends the CSV, and the server returns the biometric decision.
 
 ---
-
-### 🔑 Authentication Logic & Responses
-Decisions are returned based on sliding window predictions and majority voting logic. Possible responses include:
-* `ACCESS_GRANTED`
-* `ACCESS_DENIED` (due to unauthorized gait, static motion, or insufficient data)
+# 🔑 Authentication Responses
+| Response | Description |
+| --- | --- |
+| **GRANTED** | `[Name]`: Similarity ≥ 0.70 with an enrolled template |
+| **ACCESS_DENIED** | Similarity < 0.70 (Unrecognized pattern) |
+| **STATIC/FAKE WALK DETECTED** | Energy Score < 1.0 (Fake walk attempt) |
 
 ---
 
@@ -125,4 +140,3 @@ Decisions are returned based on sliding window predictions and majority voting l
 * **Documentation:** [Documentation.md](Documentation.md)
 
 **Final Note:** This system demonstrates that subtle human gait patterns captured through smartphone sensors can be engineered into a functional biometric system, validated through the research phase and proven in real-world deployment.
->>>>>>> 941886a (Updated documentation, reconstructed results folder, refined methodology and requirements)
