@@ -179,7 +179,45 @@ Together, these sensors capture a unique walking signature.
 
 ---
 
-# 4. Dataset Limitations & Scalability Strategy
+# 4. # 🚀 System Improvements & Production Evolution
+
+This section details the critical engineering upgrades implemented to transition from a research baseline to a deployment-ready biometric system.
+
+---
+
+### 1. Advanced Signal Normalization & Filtering
+Unlike standard min-max scaling, our production pipeline implements a physics-aware normalization strategy:
+* **Butterworth Low-Pass Filtering:** We apply a digital Butterworth filter (0.5Hz – 3Hz) to isolate the human walking frequency.
+* **Gravity Removal:** By filtering out the 0Hz component (DC bias), we effectively remove the 1G constant of Earth's gravity, ensuring the AI only analyzes active motion.
+* **Noise & Bias Suppression:** This removes high-frequency electronic jitter and sensor bias, creating a "clean" biometric wave that is consistent across different smartphone hardwares.
+
+---
+
+### 2. Robust Flask Server Architecture
+We moved beyond a basic HTTP listener to a hardened Flask-based production server:
+* **Asynchronous Processing:** Flask handles multiple incoming requests more efficiently, ensuring the mobile app doesn't "hang" during inference.
+* **API Security (X-API-KEY):** We implemented a secure handshake. The server rejects any request that doesn't provide the correct secret key, preventing unauthorized attempts to trigger the authentication engine.
+* **Inference Warm-up:** The server is programmed to "pre-load" the AI model into RAM on boot, eliminating the 10-second lag often seen in basic server setups.
+
+---
+
+### 3. Deep Metric Learning (Siamese 1D-CNN)
+The shift from Random Forest to a Siamese architecture is the core innovation of the production system:
+* **From Labels to Embeddings:** Instead of classifying "Person A" or "Person B," the model maps gait into a 128-dimensional mathematical "Embedding Space".
+* **Feature Autonomy:** The 1D-CNN automatically extracts complex spatial-temporal features from raw waves, outperforming handcrafted statistical features used in research.
+* **Similarity Matching:** By using Cosine Similarity, the system can determine identity based on the distance between embeddings, providing a much higher degree of precision for biometric matching.
+
+---
+
+### 4. Data & Model Scalability
+To ensure the system works for a real company and not just a small lab group, we implemented a massive scaling strategy:
+* **AI-Driven Synthetic Data:** We use a generator script to turn 10 real "seed" users into **100+ unique synthetic identities**, preventing the model from overfitting and memorizing specific people.
+* **On-the-Fly Augmentation:** During training, we inject "biological noise" (warping, jitter, and time-shifting), which simulates different walking speeds and phone positions.
+* **Zero-Retrain Enrollment:** Because we use an embedding-based model, **new users can be enrolled instantly.** We simply save their gait "signature" (template) to a file—there is no need to retrain the entire AI model when a new employee joins the company.
+
+---
+
+# 5. Dataset Limitations & Scalability Strategy
 
 The original research began with a 30-subject limitation from the UCI HAR dataset. Recognizing that a production-grade biometric system requires exposure to a much broader population to ensure high security and low False Acceptance Rates (FAR), the project shifted from a limited classification model to an expandable Metric Learning framework.
 
@@ -191,7 +229,7 @@ To maintain high precision, the current system operates under these engineering 
 
 ---
 
-## 4.1 Expansion Strategies Applied (Research to Production)
+## 5.1 Expansion Strategies Applied (Research to Production)
 To bridge the gap between lab data and real-world usage, the following improvements were implemented:
 1.  **Direct Data Collection:** Expanded the primary real-world test group from 5 to 10 unique users via custom collection sessions.
 2.  **Multi-Session Enrollment:** Users are enrolled via three distinct 15-second walking sessions to capture natural intra-person gait variance.
@@ -200,7 +238,7 @@ To bridge the gap between lab data and real-world usage, the following improveme
 
 ---
 
-## 4.2 Current Production Scalability Strategy (110+ Users)
+## 5.2 Current Production Scalability Strategy (110+ Users)
 The system now utilizes a sophisticated "Hybrid Scaling" approach to prepare the AI for 100+ users without requiring massive manual data collection.
 
 
@@ -213,7 +251,7 @@ The system now utilizes a sophisticated "Hybrid Scaling" approach to prepare the
 * **Embedding-Based Scalability:** * Because the system uses a Siamese architecture, adding a 111th or 500th user no longer requires retraining the model.
     * New employees are simply "mapped" into the existing 128-dimensional embedding space, making the system instantly scalable for large organizations.
 
-# 5. Validation Strategy
+# 6. Validation Strategy
 
 ### UCI HAR Results
 
@@ -247,7 +285,7 @@ Session-level authentication achieved using:
 
 ---
 
-# 6. Why UCI ≈ 90% but Real-World ≈ 70%?
+# 7. Why UCI ≈ 90% but Real-World ≈ 70%?
 
 UCI HAR:
 
@@ -268,13 +306,13 @@ This domain shift explains performance drop.
 
 ---
 
-# 7. 🔬 Methodology
+# 8. 🔬 Methodology
 
 The project's methodology evolved from a feature-engineered classification approach in the research phase to a high-performance deep metric learning pipeline for production.
 
 ---
 
-## 7.1 Research Phase: Traditional Machine Learning
+## 8.1 Research Phase: Traditional Machine Learning
 The research methodology focused on validating the feasibility of gait biometrics using established statistical techniques on the UCI HAR and RealWorld1 datasets.
 
 * **Feature Extraction:** Sensor readings (`ax, ay, az, wx, wy, wz`) were segmented into sliding windows of 128 samples. For each window, 56 handcrafted features were extracted, including time-domain (mean, std, RMS, peak-to-peak) and frequency-domain (FFT-based dominant frequency, spectral energy, frequency spread) metrics.
@@ -285,7 +323,7 @@ The research methodology focused on validating the feasibility of gait biometric
 
 ---
 
-## 7.2 Production Phase: Deep Metric Learning (Siamese CNN)
+## 8.2 Production Phase: Deep Metric Learning (Siamese CNN)
 The production system was upgraded to a modern Deep Learning architecture to support infinite scalability and superior real-world noise rejection.
 
 
@@ -300,7 +338,7 @@ The production system was upgraded to a modern Deep Learning architecture to sup
     * Authentication is granted by calculating the **Cosine Similarity** between the live probe and stored user templates.
 * **Production Threshold:** A stricter similarity threshold of **0.70** is used to ensure high-confidence biometric matching.
 
-# 8. Screenshots of Working System
+# 9. Screenshots of Working System
 
 ### UCI Validation Accuracy
 ![UCI Accuracy](results/screenshots/uci_accuracy.png)
@@ -321,7 +359,7 @@ The production system was upgraded to a modern Deep Learning architecture to sup
 
 ---
 
-# 9. LLM Usage
+# 10. LLM Usage
 
 LLMs were used as a technical assistant for:
 
