@@ -124,42 +124,56 @@ This script reads the profiles from `biomechanical_profiles.json`. It applies Fo
 ## 4. Train the Siamese LSTM Brain
 
 ```bash
-python production/LSTM_engine/train_siamese.py```
+python production/LSTM_engine/train_siamese.py
+```
 
 **How it works:**
- 
+
 This script trains the Siamese Bidirectional LSTM encoder. It uses a Contrastive Loss (or Triplet Loss) function to map complex 6-axis motion waves into a 256-dimensional embedding space.
- 
+
 **The Goal:** Force walks from the same person to cluster together while pushing walks from different people far apart on a mathematical hypersphere.
- 
+
 **Optimization:** The model is trained on both real-world data (Person 1-10) and the 5,000+ synthetic identities.
- 
+
+---
+
 ## 5. Enroll Authorized Users
- 
+
 ```bash
-python production/LSTM_engine/enroll_templates.py```
- 
+python production/LSTM_engine/enroll_templates.py
+```
+
 **How it works:**
- 
+
 Once the brain is trained, we must "enroll" the authorized personnel. This script:
- - Passes the ground-truth walks (Person 1-10) through the trained encoder.
- - Generates a unique 256-D Master Template (biometric signature) for each user.
- - Saves these signatures into `vault.json`. These are the "keys" that live walks are compared against.
- 
+
+- Passes the ground-truth walks (Person 1-10) through the trained encoder.
+- Generates a unique 256-D Master Template (biometric signature) for each user.
+- Saves these signatures into `vault.json`. These are the "keys" that live walks are compared against.
+
+---
+
 ## 6. Launch the Robust Flask Server
- 
+
 defaults:
-python production/app/flask_server.py`
 
+```bash
+python production/app/flask_server.py
+```
 
-## 7. Mobile App Integration 
+---
+
+## 7. Mobile App Integration
+
 - Install `GaitAuth_Live.apk` on your Android device.
 - **Network Setup:** Connect your phone and laptop to the same Mobile Hotspot (to bypass campus firewalls).
 - Find your laptop IP using `ipconfig` and enter it into the app (e.g., `http://192.168.1.5:8000`).
 - **Test:** Walk naturally for 15 seconds. The app sends the CSV, and the server returns the biometric decision.
 
 ---
+
 # 🔑 Authentication Responses
+
 | Response | Description |
 | --- | --- |
 | **GRANTED** | `[Name]`: Similarity ≥ 0.70 with an enrolled template |
@@ -173,40 +187,52 @@ python production/app/flask_server.py`
 The system supports two primary ways to connect the Android application to the inference server. Depending on your setup, ensure you install the correct `.apk` from the `production/mobile_app/` directory.
 
 ## 🏠 Method A: Local IP Address (Development)
+
 **Use Case:** Testing the system on your local WiFi or Mobile Hotspot without deploying to the cloud.
 
 **App to Use:** `GaitAuth_Flask2.apk`
 
 ### Setup Steps:
+
 1. Connect both your laptop and phone to the same Mobile Hotspot (recommended to bypass firewall restrictions).
 2. Find your laptop's Local IP by typing `ipconfig` in the terminal (e.g., `192.168.1.5`).
 3. Open the app and enter the URL: `http://YOUR_IP:8000/predict` (or port 7860 if running the production script).
 
 **Advantage:** Minimal latency and works without an active internet connection.
 
+---
+
 ## 🌐 Method B: Live Link (Cloud Verification)
+
 **Use Case:** Accessing the server via the public internet once deployed on Render or Hugging Face.
 
 **App to Use:** `GaitAuth_Live.apk`
 
 ### Setup Steps:
+
 1. Ensure your server is deployed and the status is **Live/Running**.
 2. Copy your public URL from the Render/Hugging Face dashboard (e.g., `https://gait-secure-api.onrender.com`).
 3. Open the app and enter the URL: `https://your-app-name.onrender.com/predict`.
 
 **Advantage:** Allows for remote authentication from any location with internet access.
 
+---
+
 ## ⚠️ Connectivity Troubleshooting
+
 - **API Key:** Both methods require the header `X-API-KEY: GAIT_SECURE_2026` to be configured within the app logic.
 - **Cold Start:** If using Method B on Render's free tier, the first request may take ~50 seconds to "wake up" the server.
 - **Endpoint:** Always ensure the URL ends with the `/predict` route.
 
+---
+
 ### 📂 Further Information
-* **Project Structure:** Refer to the directory tree layout provided in the main README.
-* **Research vs. Production:** See the comparison table in the sections above for phase differences.
-* **Research Documentation:** [research/README.md](research/README.md)
-* **Deployment Details:** [production/README.md](production/README.md)
-* **LLM Usage:** [llm_usage.md](llm_usage.md)
-* **Documentation:** [Documentation.md](Documentation.md)
+
+- **Project Structure:** Refer to the directory tree layout provided in the main README.
+- **Research vs. Production:** See the comparison table in the sections above for phase differences.
+- **Research Documentation:** [research/README.md](research/README.md)
+- **Deployment Details:** [production/README.md](production/README.md)
+- **LLM Usage:** [llm_usage.md](llm_usage.md)
+- **Documentation:** [Documentation.md](Documentation.md)
 
 **Final Note:** This system demonstrates that subtle human gait patterns captured through smartphone sensors can be engineered into a functional biometric system, validated through the research phase and proven in real-world deployment.
