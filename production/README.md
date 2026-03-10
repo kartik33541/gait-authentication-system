@@ -151,3 +151,20 @@ The system returns decisions based on both LSTM Similarity and LLM Diagnostics:
 ![Gait Embedding PCA](../results/screenshots/PCA_chart.jpeg)
 
 *PCA projection of the learned gait embedding space showing clear separation between enrolled users.*
+
+## 🚀 Live Deployment
+
+Biometric gait authentication model is deployed on HuggingFace Spaces.
+
+### API Endpoint
+POST https://kartik33541-gait-authentication.hf.space/predict
+
+Header:
+X-API-KEY: GAIT_SECURE_2026
+
+### Server Status
+https://kartik33541-gait-authentication.hf.space
+
+### Live Logs
+https://huggingface.co/spaces/kartik33541/gait-authentication
+
