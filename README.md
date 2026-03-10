@@ -65,103 +65,189 @@ This section is for evaluating the initial feasibility of the project using hand
 
 ---
 
-## 🚀 OPTION B — Real-Time Production System (Siamese 1D-CNN)
+## 🚀 OPTION B — Real-Time Production System (Siamese LSTM)
 The production system is a hardened, scalable API designed for real-world deployment.
 
-### 🧬 Model Architecture & Logic
-- **Architecture:** Siamese 1D-Convolutional Neural Network (1D-CNN)
-- **Core Engine:** Deep Metric Learning using Triplet Loss to map gait cycles into a 128-D embedding space.
-- **Preprocessing:** Butterworth Bandpass Filter (0.5Hz – 3Hz) removes gravity bias and sensor jitter.
-- **Security Guard:** Physics-based Walk Energy Score (`std(√(a_x^2 + a_y^2 + a_z^2)) ≥ 1.0`) to defeat "lift-and-drop" spoofing attacks.
-- **Authentication:** Cosine Similarity threshold of 0.70 for biometric matching.
+# Model Architecture & Logic
 
-# 📝 Step-by-Step Production Setup
+## Architecture
+- **Siamese Recurrent Neural Network** using LSTM layers to capture temporal gait dynamics from smartphone IMU signals.
 
-## 1. Navigate to Production
+## Core Engine
+- **Deep Metric Learning** with Triplet Loss, which learns a discriminative embedding space where gait cycles from the same user cluster together while different users are pushed apart.
+
+## Embedding Space
+- Each gait window is mapped into a 256-dimensional normalized embedding vector representing the user's walking signature.
+
+## Preprocessing Pipeline
+- Sliding window segmentation of IMU signals (`ax`, `ay`, `az`, `wx`, `wy`, `wz`).
+- Standardization using a global scaler (`scaler.pkl`) learned during training.
+- Consistent preprocessing applied during training, blind testing, and real-time authentication.
+
+## Anti-Spoofing Guard
+- A physics-based Walk Energy Score:
+
+```plaintext
+std( √(ax² + ay² + az²) ) ≥ 1.0
+```
+- This score is used to detect static phones, fake motion, or lift-and-drop spoofing attempts before biometric inference.
+
+## Authentication Strategy
+- Multiple gait windows are encoded individually.
+- Window-level cosine similarity is computed against stored user templates.
+- Voting and averaged similarity scoring determine the final identity.
+
+## Decision Threshold
+- Cosine Similarity ≥ 0.75 is required for authentication.
+
+## Template Vault
+- Each enrolled user is represented by multiple gait templates, improving robustness against natural walking variations.
+
+# Production Setup (Quick Guide)
+
+## 1️⃣ Navigate to Production
+
 ```bash
 cd production
 ```
-# Gait-Secure: Authentication & Deployment Guide
 
-This document outlines the step-by-step procedure to scale the dataset, train the Siamese LSTM brain, and deploy the production-grade Flask server.
+*All commands below assume you are inside the production folder.*
 
-## 1. Environment Setup
+---
 
-Ensure all production dependencies are installed:
+## 2️⃣ Install Dependencies
+
+*Install required Python libraries.*
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 2. Fetch Biomechanical User Profiles via LLM
+---
 
-Before synthesizing data, we must generate unique physical identities for the synthetic population.
+## 3️⃣ Generate Biomechanical Profiles (LLM)
 
-**Command:**
-
-```bash
-python production/RealWorldLive/generate_llm_profiles.py
-```
-
-**How it works:**
-
-This script interfaces with Gemini 2.5 Flash to create a diverse database of 5,000+ biomechanical profiles. It assigns realistic, correlated physical traits (height, weight, age) to each synthetic identity, which serves as the "DNA" for the motion synthesizer.
-
-## 3. Scaling the Dataset (High-Fidelity AI Synthesizer)
-
-To prevent the model from overfitting to a small group of users, we expand the 10 real-world "seed" users into a massive population of 5,000+ unique identities using the generated biomechanical profiles.
-
-**Command:**
+*Create realistic physical identities for synthetic users.*
 
 ```bash
-python production/RealWorldLive/generate_synthetic_gait.py
+python RealWorldData/generate_llm_profiles.py
 ```
 
-**How it works:**
-
-This script reads the profiles from `biomechanical_profiles.json`. It applies Fourier Harmonic Synthesis and Exponential Heel-Strike Transients to create hardware-indistinguishable sensor data for 5,000+ users. This ensures the LSTM learns the generalized "physics" of human walking rather than memorizing individual files.
-
-## 4. Train the Siamese LSTM Brain
-
-```bash
-python production/LSTM_engine/train_siamese.py
-```
-
-**How it works:**
-
-This script trains the Siamese Bidirectional LSTM encoder. It uses a Contrastive Loss (or Triplet Loss) function to map complex 6-axis motion waves into a 256-dimensional embedding space.
-
-**The Goal:** Force walks from the same person to cluster together while pushing walks from different people far apart on a mathematical hypersphere.
-
-**Optimization:** The model is trained on both real-world data (Person 1-10) and the 5,000+ synthetic identities.
+*This generates `biomechanical_profiles.json` using Gemini.*
 
 ---
 
-## 5. Enroll Authorized Users
+## 4️⃣ Generate Synthetic Gait Data
+
+*Expand the dataset using a physics-based gait synthesizer.*
 
 ```bash
-python production/LSTM_engine/enroll_templates.py
+python RealWorldData/generate_synthetic_gait.py
 ```
 
-**How it works:**
-
-Once the brain is trained, we must "enroll" the authorized personnel. This script:
-
-- Passes the ground-truth walks (Person 1-10) through the trained encoder.
-- Generates a unique 256-D Master Template (biometric signature) for each user.
-- Saves these signatures into `vault.json`. These are the "keys" that live walks are compared against.
+*This produces thousands of synthetic users in:*  
+`RealWorldData/SyntheticUsers/`
 
 ---
 
-## 6. Launch the Robust Flask Server
+## 5️⃣ Train the Siamese LSTM Model
 
-defaults:
+*Train the deep metric learning encoder.*
 
 ```bash
-python production/app/flask_server.py
+python LSTM_engine/train_siamese.py
 ```
 
+*The model learns **256-D gait embeddings** using **Triplet Loss**.*
+
 ---
+
+## 6️⃣ Create Global Feature Scaler
+
+*Generate the scaler used during inference.*
+
+```bash
+python create_scaler.py
+```
+
+*This produces:*  
+`scaler.pkl`
+
+---
+
+## 7️⃣ Enroll Authorized Users
+
+*Create biometric templates for the real users.*
+
+<br>
+
+defaults to:
+
+done in:  
+templates are stored in:  
+directory: `LSTM_engine/vault.json`.
+
+done in:  
+templates are stored in:  
+directory: `LSTM_engine/vault.json`.
+
+done in:  
+templates are stored in:  
+directory: `LSTM_engine/vault.json`.
+
+done in:  
+templates are stored in:  
+directory: `LSTM_engine/vault.json`.
+
+done in:  
+templates are stored in:  
+directory: `LSTM_engine/vault.json`.
+
+defaults to:  
+scripts for enrolling templates.
+
+bash script:
+```bash
+python LSTM_engine/enroll_templates.py
+```
+
+and templates are stored at:  
+`LSTM_engine/vault.json`.
+
+defaults to:  
+scripts for enrolling templates.
+
+bash script:
+```bash
+python LSTM_engine/enroll_templates.py
+```
+
+and templates are stored at:  
+`LSTM_engine/vault.json`.
+
+defaults to:  
+scripts for enrolling templates.
+
+bash script:
+```bash
+python LSTM_engine/enroll_templates.py
+```
+
+and templates are stored at:  
+`LSTM_engine/vault.json`.
+
+defaults to:  
+scripts for enrolling templates.
+
+bash script:
+```bash
+python LSTM_engine/enroll_templates.py
+```
+
+and templates are stored at:  
+`LSTM_engine/vault.json`.
+
+defaults to:
 
 ## 7. Mobile App Integration
 

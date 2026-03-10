@@ -1,21 +1,47 @@
-# Ignore Python cache files
+# ===============================
+# Python Cache
+# ===============================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# --- DATA MANAGEMENT ---
-# We WANT to push Person 1-10, so we do NOT ignore them.
-# We IGNORE the massive generated folder to keep GitHub light.
-RealWorldLive/synthetic_data/
-
-# Ignore the live incoming data buffer from the phone
-received_gait.csv
-
-# Ignore virtual environments
+# ===============================
+# Virtual Environments
+# ===============================
 venv/
 env/
+.venv/
 
-# Ignore IDE settings
+# ===============================
+# Environment Secrets
+# ===============================
+.env
+
+# ===============================
+# IDE / Editor Settings
+# ===============================
 .vscode/
 .idea/
 
-.env
+# ===============================
+# Runtime Generated Files
+# ===============================
+received_gait.csv
+received_gait_*.csv
+
+# ===============================
+# Synthetic Dataset (Huge)
+# ===============================
+RealWorldData/SyntheticUsers/
+
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Logs (if any created later)
+# ===============================
+*.log
